@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.hhh.screenshotgallery.api.NetworkClient;
 import com.hhh.screenshotgallery.api.UserApi;
+import com.hhh.screenshotgallery.model.PhotoRes;
 import com.hhh.screenshotgallery.model.UserReq;
 import com.hhh.screenshotgallery.model.UserRes;
 import com.hhh.screenshotgallery.utils.Utils;
@@ -78,11 +79,11 @@ public class LoginActivity extends AppCompatActivity {
 
                 // 바디에 데이터 담아서 보낸다.
                 UserReq userReq = new UserReq(email, password);
-                Call<UserRes> call = api.userLogin(userReq);
-                call.enqueue(new Callback<UserRes>() {
+                Call<PhotoRes> call = api.userLogin(userReq);
+                call.enqueue(new Callback<PhotoRes>() {
                     @Override
-                    public void onResponse(Call<UserRes> call, Response<UserRes> response) {
-                        Log.i("MyMemoApp", ""+response.code());
+                    public void onResponse(Call<PhotoRes> call, Response<PhotoRes> response) {
+                        Log.i("LoginActivity", ""+response.code());
 
                         dismissProgress();
 
@@ -91,7 +92,7 @@ public class LoginActivity extends AppCompatActivity {
                             // 1. accessToken을 저장하고,
                             SharedPreferences sp = getSharedPreferences(Utils.PREFERENCES_NAME, MODE_PRIVATE);
 
-                            String accessToken = response.body().getAccess_token();
+                            String accessToken = response.body().getResult();
 
                             SharedPreferences.Editor editor = sp.edit();
                             editor.putString("accessToken", accessToken);
@@ -104,9 +105,11 @@ public class LoginActivity extends AppCompatActivity {
                         }else{
 
                         }
+
                     }
+
                     @Override
-                    public void onFailure(Call<UserRes> call, Throwable t) {
+                    public void onFailure(Call<PhotoRes> call, Throwable t) {
                         dismissProgress();
                     }
                 });

@@ -15,3 +15,5 @@
 local.properties
 
 /app/src/main/java/com/hhh/screenshotgallery/utils/Utils.java
+/app/src/main/res/drawable-v24/screenshot1.jpg
+/app/src/main/res/drawable-v24/screenshot2.jpg
