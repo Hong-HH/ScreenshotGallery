@@ -1,5 +1,6 @@
 package com.hhh.screenshotgallery;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -115,21 +116,20 @@ public class MainActivity extends AppCompatActivity {
                 if (response.isSuccessful()){
                     // 어댑터 만들어서, 리사이클러뷰에 붙여준다.
                     // 그러면 화면에, 리스트가 표시된다.
+                    Log.i("여기 지나가니", "???????????????????????????????");
                     photoTagList = response.body().getResult();
                     Log.i("Main_getNetwork", ""+photoTagList.size());
 
                     adapter = new PhotoTagAdapter(MainActivity.this, photoTagList);
                     // 어댑터를 새로 만드는 코드 바로 아래에, 클릭 이벤트를 여기에 작성
-                    adapter.setOnItemClickListener(new PhotoAdapter.OnItemClickListener() {
+                    adapter.setOnItemClickListener(new PhotoTagAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(int index) {
                             PhotoTag photoTag = photoTagList.get(index);
-
                             // 정보를 통으로 photoActivity에 넘겨주기
                             Intent i = new Intent(MainActivity.this, PhotoActivity.class);
                             i.putExtra("photoTag", photoTag);
                             startActivityForResult(i, 2);
-
                         }
 
                         @Override
@@ -138,6 +138,7 @@ public class MainActivity extends AppCompatActivity {
                             showAlertDialog();
                         }
                     }); // 어뎁터 클릭 이벤트 끝
+
 
                     recyclerView.setAdapter(adapter);
 
@@ -196,4 +197,19 @@ public class MainActivity extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("MyMemoApp", ""+requestCode+" "+resultCode);
+        if(requestCode == 1 && resultCode == 3) {
+            // 메모가 생성되어서, 다시 메인으로 돌아온경우.
+            getNetworkData();
+        } else if (requestCode == 2 && resultCode == 4){
+            // 메모가 업데이트 된 경우, 다시 메인으로 돌아왔으므로,
+            getNetworkData();
+        }
+    }
+
+
 }

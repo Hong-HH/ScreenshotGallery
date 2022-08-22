@@ -1,6 +1,7 @@
 package com.hhh.screenshotgallery.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,14 +29,15 @@ public class PhotoTagAdapter extends RecyclerView.Adapter<PhotoTagAdapter.ViewHo
         void onDeleteClick(int index);
     }
 
-    PhotoAdapter.OnItemClickListener listener;
+    OnItemClickListener listener;
 
-    public void setOnItemClickListener(PhotoAdapter.OnItemClickListener listener){
+    public void setOnItemClickListener(OnItemClickListener listener){
         this.listener = listener;
     }
     //////////////////////////////////////////////////////////////////
     Context context;
     List<PhotoTag> photoTagList;
+    List<Tag> tagList_1;
 
     public PhotoTagAdapter(Context context, List<PhotoTag> photoTagList) {
         this.context = context;
@@ -50,7 +52,7 @@ public class PhotoTagAdapter extends RecyclerView.Adapter<PhotoTagAdapter.ViewHo
         private CardView cardView;
         private ImageView imgDelete;
         private ImageView imgPhoto;
-        private List<Tag> tag;
+        private List<Tag> tagList;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,7 +92,7 @@ public class PhotoTagAdapter extends RecyclerView.Adapter<PhotoTagAdapter.ViewHo
     public PhotoTagAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.main_row, parent, false);
-        return new PhotoTagAdapter.ViewHolder(view);
+        return new ViewHolder(view);
     }
 
     @Override
@@ -103,17 +105,32 @@ public class PhotoTagAdapter extends RecyclerView.Adapter<PhotoTagAdapter.ViewHo
 
         // todo 이거 recycler view 안에 recycler view 넣는 법 나중에 검색
         // 현재는 그냥 쭉 이어붙이기로 가는 중
-        List<Tag> tagList_1 = photoTag.getTag();
-//        ArrayList<String> stringList = new ArrayList<String>();
-        StringBuffer sb = new StringBuffer ();
-        for (Tag tag1 : tagList_1) {
-            String keyword =  tag1.getTag();
-            sb.append("#");
-            sb.append(keyword);
-            sb.append(" ");
+        if (tagList_1 != null){
+            tagList_1.clear();
         }
-        String concat = sb.toString();
-        holder.txtTag.setText(concat);
+        tagList_1 = photoTag.getTag();
+//        ArrayList<String> stringList = new ArrayList<String>();
+        if (tagList_1 != null){
+            Log.i("adapter", "tag 갯수 : "+tagList_1.size());
+
+            StringBuilder sb = new StringBuilder ();
+            for (Tag tag1 : tagList_1) {
+                String keyword =  tag1.getTag();
+                sb.append("#");
+                sb.append(keyword);
+                sb.append(" ");
+            }
+            String concat = sb.toString();
+            holder.txtTag.setText(concat);
+        } else if (tagList_1 == null){
+            String sentence = "태그가 없습니다";
+            holder.txtTag.setText(sentence);
+        } else {
+            String sentence = "태그가 없는것 같습니다.";
+            holder.txtTag.setText(sentence);
+        }
+
+            
 
 
         Glide.with(context).load(Utils.IMAGE_URL+photoTag.getPhoto_url())

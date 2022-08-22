@@ -14,6 +14,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -34,6 +35,11 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.hhh.screenshotgallery.api.NetworkClient;
+import com.hhh.screenshotgallery.api.PhotoApi;
+import com.hhh.screenshotgallery.model.PhotoRes;
+import com.hhh.screenshotgallery.utils.Utils;
+
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -46,7 +52,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 public class PhotoAddActivity extends AppCompatActivity {
 
@@ -84,6 +99,78 @@ public class PhotoAddActivity extends AppCompatActivity {
                 // 네트워크로 보낸다.
 
                 showProgress("메모 저장 중입니다...");
+
+                Retrofit retrofit = NetworkClient.getRetrofitClient(PhotoAddActivity.this);
+                PhotoApi api = retrofit.create(PhotoApi.class);
+
+                SharedPreferences sp = getSharedPreferences(Utils.PREFERENCES_NAME, MODE_PRIVATE);
+                String accessToken = sp.getString("accessToken", "");
+
+                Log.i("PhotoAdd_AccessToken", ""+accessToken);
+
+                RequestBody fileBody = RequestBody.create(photoFile,
+                                        MediaType.parse("image/*"));
+                MultipartBody.Part part = MultipartBody.Part.createFormData(
+                        "photo", photoFile.getName(), fileBody
+                );
+
+                Log.i("PhotoAdd filename", photoFile.getName());
+                RequestBody titleBody = RequestBody.create(
+                        MediaType.parse("text/plain"), title);
+                RequestBody contentBody = RequestBody.create(
+                        MediaType.parse("text/plain"), content);
+
+                // todo 사진에서 찍은 날짜, 시간 가져오기
+                String photo_time = "2022-08-16";
+
+                RequestBody photo_timeBody = RequestBody.create(
+                        MediaType.parse("text/plain"), photo_time);
+
+                HashMap<String, RequestBody> requestBodyHashMap =
+                        new HashMap<>();
+                requestBodyHashMap.put("title", titleBody);
+                requestBodyHashMap.put("content", contentBody);
+                requestBodyHashMap.put("photo_time", photo_timeBody);
+
+                Call<PhotoRes> call = api.addPhoto("Bearer "+accessToken,
+                        part, requestBodyHashMap);
+
+                Log.i("PhotoAdd Call", "통과");
+
+                call.enqueue(new Callback<PhotoRes>() {
+                    @Override
+                    public void onResponse(Call<PhotoRes> call, Response<PhotoRes> response) {
+                        dismissProgress();
+                        if(response.isSuccessful()){
+                            // 200 OK 인 경우
+                            // 정상 저장되었으면, 이 액티비티는 끝낸다.
+                            setResult(3);
+                            finish();
+                        }else{
+                            Toast.makeText(PhotoAddActivity.this,
+                                    "저장 실패 ㅠㅠ",
+                                    Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<PhotoRes> call, Throwable t) {
+                        dismissProgress();
+                        Toast.makeText(PhotoAddActivity.this,
+                                "네트워크 문제 발생",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                });
+            }
+        });
+
+        imgPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // 알러트 다이얼로그 띄운다. (사진찍기 / 앨범에서 선택)
+                showDialog();
             }
         });
 
