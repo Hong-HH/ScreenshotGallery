@@ -17,7 +17,6 @@ import com.hhh.screenshotgallery.api.NetworkClient;
 import com.hhh.screenshotgallery.api.UserApi;
 import com.hhh.screenshotgallery.model.PhotoRes;
 import com.hhh.screenshotgallery.model.UserReq;
-import com.hhh.screenshotgallery.model.UserRes;
 import com.hhh.screenshotgallery.utils.Utils;
 
 import retrofit2.Call;

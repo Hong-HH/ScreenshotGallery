@@ -3,6 +3,7 @@ package com.hhh.screenshotgallery.api;
 import com.hhh.screenshotgallery.model.PhotoList;
 import com.hhh.screenshotgallery.model.PhotoReq;
 import com.hhh.screenshotgallery.model.PhotoRes;
+import com.hhh.screenshotgallery.model.PhotoTagList;
 
 import java.util.Map;
 
@@ -25,24 +26,30 @@ public interface PhotoApi {
     // 메모 생성 API
     @Multipart
     @POST("/v1/photo")
-    Call<PhotoRes> addMemo(@Header("Authorization") String accessToken,
+    Call<PhotoRes> addPhoto(@Header("Authorization") String accessToken,
                           @Part MultipartBody.Part photo,
                           @PartMap Map<String, RequestBody> params);
 
     // 내 메모 리스트 가져오는 API
     @GET("/v1/photo")
-    Call<PhotoList> getMemoList(@Header("Authorization") String accessToken,
+    Call<PhotoList> getPhotoList(@Header("Authorization") String accessToken,
                                 @Query("offset") int offset,
                                 @Query("limit") int limit);
 
     // 메모 업데이트 API
     @PUT("/v1/photo/{photoID}")
-    Call<PhotoRes> updateMemo(@Header("Authorization") String accessToken,
-                              @Path("photoID") int memoId,
+    Call<PhotoRes> updatePhoto(@Header("Authorization") String accessToken,
+                              @Path("photoID") int photoId,
                               @Body PhotoReq photoReq);
 
     // 메모 삭제 API
     @DELETE("/v1/photo/{photoID}")
-    Call<PhotoRes> deleteMemo(@Header("Authorization") String accessToken,
-                             @Path("photoID") int memoId);
+    Call<PhotoRes> deletePhoto(@Header("Authorization") String accessToken,
+                             @Path("photoID") int photoId);
+
+    // 내 메모 리스트 가져오는 API
+    @GET("/v1/photoTag")
+    Call<PhotoTagList> getPhotoTagList(@Header("Authorization") String accessToken,
+                                       @Query("offset") int offset,
+                                       @Query("limit") int limit);
 }

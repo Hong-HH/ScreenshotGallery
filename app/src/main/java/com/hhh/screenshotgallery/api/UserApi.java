@@ -2,7 +2,6 @@ package com.hhh.screenshotgallery.api;
 
 import com.hhh.screenshotgallery.model.PhotoRes;
 import com.hhh.screenshotgallery.model.UserReq;
-import com.hhh.screenshotgallery.model.UserRes;
 
 import retrofit2.Call;
 import retrofit2.http.Body;

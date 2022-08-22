@@ -14,31 +14,32 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.hhh.screenshotgallery.R;
 import com.hhh.screenshotgallery.model.Photo;
+import com.hhh.screenshotgallery.model.PhotoTag;
 import com.hhh.screenshotgallery.model.Tag;
 import com.hhh.screenshotgallery.utils.Utils;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
+public class PhotoTagAdapter extends RecyclerView.Adapter<PhotoTagAdapter.ViewHolder> {
     // 리사이클러뷰에서, 클릭이벤트 처리할때는 아래 코드를 그냥 카피해서 사용
     public interface OnItemClickListener{
         void onItemClick(int index);
         void onDeleteClick(int index);
     }
 
-    OnItemClickListener listener;
+    PhotoAdapter.OnItemClickListener listener;
 
-    public void setOnItemClickListener(OnItemClickListener listener){
+    public void setOnItemClickListener(PhotoAdapter.OnItemClickListener listener){
         this.listener = listener;
     }
     //////////////////////////////////////////////////////////////////
-
     Context context;
-    List<Photo> photoList;
+    List<PhotoTag> photoTagList;
 
-    public PhotoAdapter(Context context, List<Photo> photoList) {
+    public PhotoTagAdapter(Context context, List<PhotoTag> photoTagList) {
         this.context = context;
-        this.photoList = photoList;
+        this.photoTagList = photoTagList;
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
@@ -49,6 +50,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         private CardView cardView;
         private ImageView imgDelete;
         private ImageView imgPhoto;
+        private List<Tag> tag;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -83,30 +85,44 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
             });
         }
     }
-
     @NonNull
     @Override
-    public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PhotoTagAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.main_row, parent, false);
-        return new ViewHolder(view);
+        return new PhotoTagAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PhotoTagAdapter.ViewHolder holder, int position) {
         // 자바의 리스트에 들어있는 데이터와, 화면을 연결시키는 역할.
-        Photo photo = photoList.get(position);
-        holder.txtTitle.setText(photo.getTitle());
-        holder.txtContent.setText(photo.getContent());
-        holder.txtDate.setText( photo.getCreated_at() );
+        PhotoTag photoTag = photoTagList.get(position);
+        holder.txtTitle.setText(photoTag.getTitle());
+        holder.txtContent.setText(photoTag.getContent());
+        holder.txtDate.setText( photoTag.getCreated_at() );
 
-        Glide.with(context).load(Utils.IMAGE_URL+photo.getPhoto_url())
+        // todo 이거 recycler view 안에 recycler view 넣는 법 나중에 검색
+        // 현재는 그냥 쭉 이어붙이기로 가는 중
+        List<Tag> tagList_1 = photoTag.getTag();
+//        ArrayList<String> stringList = new ArrayList<String>();
+        StringBuffer sb = new StringBuffer ();
+        for (Tag tag1 : tagList_1) {
+            String keyword =  tag1.getTag();
+            sb.append("#");
+            sb.append(keyword);
+            sb.append(" ");
+        }
+        String concat = sb.toString();
+        holder.txtTag.setText(concat);
+
+
+        Glide.with(context).load(Utils.IMAGE_URL+photoTag.getPhoto_url())
                 .into(holder.imgPhoto);
 
     }
 
     @Override
     public int getItemCount() {
-        return photoList.size();
+        return photoTagList.size();
     }
 }

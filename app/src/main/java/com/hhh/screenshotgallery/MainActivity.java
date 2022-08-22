@@ -16,10 +16,13 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 
 import com.hhh.screenshotgallery.adapter.PhotoAdapter;
+import com.hhh.screenshotgallery.adapter.PhotoTagAdapter;
 import com.hhh.screenshotgallery.api.NetworkClient;
 import com.hhh.screenshotgallery.api.PhotoApi;
 import com.hhh.screenshotgallery.model.Photo;
 import com.hhh.screenshotgallery.model.PhotoList;
+import com.hhh.screenshotgallery.model.PhotoTag;
+import com.hhh.screenshotgallery.model.PhotoTagList;
 import com.hhh.screenshotgallery.utils.Utils;
 
 import java.util.ArrayList;
@@ -37,8 +40,9 @@ public class MainActivity extends AppCompatActivity {
     int offset = 0;
     int limit = 25;
     int cnt;
-    List<Photo> photoList = new ArrayList<>();
-    PhotoAdapter adapter;
+    List<PhotoTag> photoTagList = new ArrayList<>();
+
+    PhotoTagAdapter adapter;
 
     ProgressBar progressBar;
 
@@ -95,40 +99,35 @@ public class MainActivity extends AppCompatActivity {
     private void getNetworkData() {
         offset = 0;
         cnt = 0;
-        photoList.clear();
+        photoTagList.clear();
 
 //        progressBar.setVisibility(View.VISIBLE);
 
         Retrofit retrofit = NetworkClient.getRetrofitClient(MainActivity.this);
         PhotoApi api = retrofit.create(PhotoApi.class);
 
-        Call<PhotoList> call = api.getMemoList("Bearer "+accessToken,
+        Call<PhotoTagList> call = api.getPhotoTagList("Bearer " + accessToken,
                 offset, limit);
 
-        call.enqueue(new Callback<PhotoList>() {
+        call.enqueue(new Callback<PhotoTagList>() {
             @Override
-            public void onResponse(Call<PhotoList> call, Response<PhotoList> response) {
-//                progressBar.setVisibility(View.GONE);
-
-                if(response.isSuccessful()){
+            public void onResponse(Call<PhotoTagList> call, Response<PhotoTagList> response) {
+                if (response.isSuccessful()){
                     // 어댑터 만들어서, 리사이클러뷰에 붙여준다.
                     // 그러면 화면에, 리스트가 표시된다.
+                    photoTagList = response.body().getResult();
+                    Log.i("Main_getNetwork", ""+photoTagList.size());
 
-                    photoList = response.body().getList();
-                    Log.i("Main_getNetwork", ""+photoList.size());
-                    Log.i("Main_getNetwork", response.body().toString());
-                    adapter = new PhotoAdapter(MainActivity.this, photoList);
+                    adapter = new PhotoTagAdapter(MainActivity.this, photoTagList);
                     // 어댑터를 새로 만드는 코드 바로 아래에, 클릭 이벤트를 여기에 작성
                     adapter.setOnItemClickListener(new PhotoAdapter.OnItemClickListener() {
                         @Override
                         public void onItemClick(int index) {
-                            Photo photo = photoList.get(index);
+                            PhotoTag photoTag = photoTagList.get(index);
 
-                            // todo PhotoActivity 로 이동
-                            // 이 이 메모 정보가 들어있는 클래스를 통으로
-                            // 넘겨주면된다.
+                            // 정보를 통으로 photoActivity에 넘겨주기
                             Intent i = new Intent(MainActivity.this, PhotoActivity.class);
-                            i.putExtra("photo", photo);
+                            i.putExtra("photoTag", photoTag);
                             startActivityForResult(i, 2);
 
                         }
@@ -138,18 +137,17 @@ public class MainActivity extends AppCompatActivity {
                             position = index;
                             showAlertDialog();
                         }
-                    });
-
+                    }); // 어뎁터 클릭 이벤트 끝
 
                     recyclerView.setAdapter(adapter);
 
-                    // 스크롤 처리를 위해 필요한 변수들 값 셋팅
+                    // 스크롤 처리를 위한 변수 값 셋팅
                     cnt = response.body().getCount();
                     offset = offset + cnt;
 
                 }else{
-
-                    // 로그인이 풀린 상태이므로, 억세스토큰이 유효하지 않다.
+                    // 응답이 성공적이지 않다면
+                    // 로그인이 풀린 상태이므로, 억세스토큰이 유효하지 않다
                     // 따라서 로그인 화면을 띄운다.
                     if(response.code() == 500){
                         Intent intent = new Intent(MainActivity.this,
@@ -157,16 +155,20 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         finish();
                     }
-                }
+
+                } //response.isSuccessful() end
             }
 
             @Override
-            public void onFailure(Call<PhotoList> call, Throwable t) {
-                progressBar.setVisibility(View.GONE);
+            public void onFailure(Call<PhotoTagList> call, Throwable t) {
+//                progressBar.setVisibility(View.GONE);
             }
-        });
+        }); //call.enqueue 끝
 
-    }
+    } //getNetworkData END
+
+
+
 
     // 우리가 만든 함수. 화면에 네트워크 처리중이라고 표시할 것.
     private void showProgress(String message){
