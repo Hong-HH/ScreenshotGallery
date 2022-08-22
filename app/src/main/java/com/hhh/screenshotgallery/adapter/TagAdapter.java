@@ -72,6 +72,7 @@ public class TagAdapter extends RecyclerView.Adapter<TagAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        // 자바의 리스트에 들어있는 데이터와, 화면을 연결시키는 역할.
         Tag tag = tagList.get(position);
         holder.txtTag.setText( tag.getTag() );
     }

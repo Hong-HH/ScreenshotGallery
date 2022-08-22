@@ -54,14 +54,24 @@ public class PhotoActivity extends AppCompatActivity {
         // https://stackoverflow.com/questions/3240331/horizontal-listview-in-android
         recyclerView = findViewById(R.id.tagRecyclerView);
         recyclerView.setHasFixedSize(true);
-//        LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
-//        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setLayoutManager(new LinearLayoutManager(PhotoActivity.this));
+        LinearLayoutManager layoutManager= new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL, false);
+        recyclerView.setLayoutManager(layoutManager);
+//        recyclerView.setLayoutManager(new LinearLayoutManager(PhotoActivity.this));
 
 
         tagList = photoTag.getTag();
         Log.i("photoActivity", "tag 갯수 : "+ tagList.size());
+//        List<String> tagNameList =  new ArrayList<>(tagList.size());
+//        Integer i = 0;
+//        for ( Tag tag1 : tagList ){
+//            String word = tag1.getTag();
+//            tagNameList.add(word);
+//        }
+
+
+//        adapter = new TagAdapter(PhotoActivity.this, tagNameList);
         adapter = new TagAdapter(PhotoActivity.this, tagList);
+
         adapter.setOnItemClickListener(new TagAdapter.OnItemClickListener() {
             @Override
             public void onItemClick(int index) {
@@ -75,6 +85,8 @@ public class PhotoActivity extends AppCompatActivity {
 
             }
         });
+
+        recyclerView.setAdapter(adapter);
 
 
     }
