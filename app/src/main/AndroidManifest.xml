@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ScreenshotGallery">
         <activity
+            android:name=".TagActivity"
+            android:exported="false" />
+        <activity
             android:name=".PhotoAddActivity"
             android:exported="false" />
         <activity

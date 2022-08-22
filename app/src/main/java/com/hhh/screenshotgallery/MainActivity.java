@@ -46,15 +46,17 @@ public class MainActivity extends AppCompatActivity {
     PhotoTagAdapter adapter;
 
     ProgressBar progressBar;
+    private ProgressDialog progressDialog;
 
     String accessToken;
-    private ProgressDialog progressDialog;
     private int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        showProgress("로딩중 ... ");
 
         Log.i("ScreenshotGallery", "MainActivity");
 
@@ -64,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         Log.i("Main_point1", accessToken);
         if(accessToken.isEmpty()){
             // 로그인 액티비티를 띄운다.
+            dismissProgress();
             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             startActivity(intent);
             finish();
@@ -91,6 +94,8 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 
 
 
@@ -146,10 +151,13 @@ public class MainActivity extends AppCompatActivity {
                     cnt = response.body().getCount();
                     offset = offset + cnt;
 
+                    dismissProgress();
+
                 }else{
                     // 응답이 성공적이지 않다면
                     // 로그인이 풀린 상태이므로, 억세스토큰이 유효하지 않다
                     // 따라서 로그인 화면을 띄운다.
+                    dismissProgress();
                     if(response.code() == 500){
                         Intent intent = new Intent(MainActivity.this,
                                 LoginActivity.class);
@@ -163,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onFailure(Call<PhotoTagList> call, Throwable t) {
 //                progressBar.setVisibility(View.GONE);
+                dismissProgress();
             }
         }); //call.enqueue 끝
 
@@ -204,9 +213,11 @@ public class MainActivity extends AppCompatActivity {
         Log.i("MyMemoApp", ""+requestCode+" "+resultCode);
         if(requestCode == 1 && resultCode == 3) {
             // 메모가 생성되어서, 다시 메인으로 돌아온경우.
+            showProgress("데이터 갱신하는중!!");
             getNetworkData();
         } else if (requestCode == 2 && resultCode == 4){
             // 메모가 업데이트 된 경우, 다시 메인으로 돌아왔으므로,
+            showProgress("데이터 갱신하는중!!");
             getNetworkData();
         }
     }

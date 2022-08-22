@@ -145,7 +145,10 @@ public class PhotoAddActivity extends AppCompatActivity {
                             // 200 OK 인 경우
                             // 정상 저장되었으면, 이 액티비티는 끝낸다.
                             setResult(3);
-                            finish();
+                            showTagDialog();
+//                            MaterialAlertDialogBuilder(context)
+//                            finish();
+
                         }else{
                             Toast.makeText(PhotoAddActivity.this,
                                     "저장 실패 ㅠㅠ",
@@ -192,6 +195,25 @@ public class PhotoAddActivity extends AppCompatActivity {
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
+    private void showTagDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(PhotoAddActivity.this);
+        builder.setTitle("선택하세요").setItems(R.array.tag_array, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if(i == 0){
+                    Intent intent = new Intent(PhotoAddActivity.this, TagActivity.class);
+                    startActivity(intent);
+                    finish();
+                }else if(i == 1){
+                    finish();
+                }
+            }
+        });
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+    }
+
+
 
 
     // 우리가 만든 함수. 화면에 네트워크 처리중이라고 표시할 것.
